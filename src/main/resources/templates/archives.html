@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      th:with="lang=${#locale.language}"
+      th:lang="${lang}">
+    <head>
+        <meta charset="UTF-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">
+        <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+        <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
+        <link rel="stylesheet" th:href="@{/css/main.css}">
+        <link rel="stylesheet" href="https://ajax.googleapis.com/ajax/libs/jqueryui/1.12.1/themes/smoothness/jquery-ui.css">
+        <link rel="stylesheet" th:href="@{/css/modal.css}">
+
+        <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js" ></script>
+        <script src="https://ajax.googleapis.com/ajax/libs/jqueryui/1.12.1/jquery-ui.min.js"></script>
+        <script src="/js/open-dialog.js" th:src="@{/js/main.js}"></script>
+        <script src="/js/open-dialog.js" th:src="@{/js/open-modal.js}"></script>
+
+        <title th:text="#{archives.title}"></title>
+    </head>
+    <body>
+        <div class="header">
+            <nav class="navbar navbar-dark bg-dark">
+                <a th:href="@{/}" class="navbar-brand" th:text="#{archives.title}"></a>
+                <div class="dropdown ml-auto">
+                    <button type="button" id="lang" class="btn btn-secondary dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" th:text=#{lang.title}></button>
+                    <div class="dropdown-menu dropdown-menu-right" aria-labelledby="lang" th:object=${workForm}>
+                        <a class="dropdown-item" th:href="@{''(lang=ja, page=*{pagenation.number})}">
+                            <img src="https://icooon-mono.com/wp-content/plugins/sitepress-multilingual-cms/res/flags/ja.png" alt="ja" th:title="#{lang.ja}">
+                            <span th:text=" #{lang.ja}"></span>
+                        </a>
+                        <a class="dropdown-item" th:href="@{''(lang=en, page=*{pagenation.number})}">
+                            <img src="https://icooon-mono.com/wp-content/plugins/sitepress-multilingual-cms/res/flags/en.png" alt="en" th:title="#{lang.en}">
+                            <span th:text=" #{lang.en}"></span>
+                        </a>
+                        <a class="dropdown-item" th:href="@{''(lang=vi, page=*{pagenation.number})}">
+                            <img src="https://icooon-mono.com/wp-content/plugins/sitepress-multilingual-cms/res/flags/vi.png" alt="vi" th:title="#{lang.vi}">
+                            <span th:text=" #{lang.vi}"></span>
+                        </a>
+                    </div>
+                </div>
+            </nav>
+            <img class="logo" src="https://kta-static.s3-ap-northeast-1.amazonaws.com/image/kta_logo.png">
+        </div>
+
+        <hr>
+
+        <div class="container-fluid contents">
+            <div class="row">
+            <div class="col-md-3" th:each="work : ${workForm.workList}">
+              <img class="image-fluid dialog-link dialog-link-img" th:src="${work.imagePath}"
+                 th:data-name="|#{work.name}${work.id}|"
+                 th:data-year="${work.yearCreated}"
+                 th:data-url="${work.imagePath}"
+                 th:onclick="openModal(this.getAttribute('data-name'), this.getAttribute('data-year'), this.getAttribute('data-url'));"
+                 data-toggle="modal" data-target="#modal" />
+            </div>
+            </div>
+        </div>
+
+        <!-- Pagenation -->
+        <nav aria-label="Page navigation">
+            <ul class="pagination justify-content-center" th:object="${workForm}">
+                <li class="page-item" th:classappend="*{pagenation.first} ? 'disabled'">
+                    <a class="page-link" th:href="@{/archives(page=0)}" aria-label="First">
+                        <span aria-hidden="true">&laquo;</span>
+                    </a>
+                </li>
+                <li class="page-item" th:classappend="*{pagenation.first} ? 'disabled'">
+                    <a class="page-link" th:href="@{/archives(page=*{pagenation.number} - 1)}" aria-label="Previous">
+                        <span aria-hidden="true">&lsaquo;</span>
+                    </a>
+                </li>
+                <li th:if="*{pagenation.number gt 2}" class="page-item">
+                    <a th:href="@{/archives(page=0)}" class="page-link">1</a>
+                </li>
+                <li th:if="*{pagenation.number gt 3}" class="page-item disabled">
+                    <a href="#" class="page-link">…</a>
+                </li>
+                <th:block th:each="i : *{ #numbers.sequence(pagenation.number - 2, pagenation.number + 2) }">
+                    <li th:if="${i} ge 0 and ${i} lt *{pagenation.totalPages}" class="page-item" th:classappend="${i} eq *{pagenation.number} ? 'active'">
+                        <a th:href="@{/archives(page=${i})}" th:text="${i + 1}" class="page-link"></a>
+                    </li>
+                </th:block>
+                <li th:if="*{pagenation.totalPages gt (pagenation.number + 4)}" class="page-item disabled">
+                    <a href="#" class="page-link">…</a>
+                </li>
+                <li th:if="*{pagenation.totalPages gt (pagenation.number + 3)}" class="page-item">
+                    <a th:href="@{/archives(page=*{pagenation.totalPages - 1})}" th:text="*{pagenation.totalPages}" class="page-link"></a>
+                </li>
+                <li class="page-item" th:classappend="*{pagenation.last} ? 'disabled'">
+                    <a class="page-link" th:href="@{/archives(page=*{pagenation.number} + 1)}" aria-label="Next">
+                        <span aria-hidden="true">&rsaquo;</span>
+                    </a>
+                </li>
+                <li class="page-item" th:classappend="*{pagenation.last} ? 'disabled'">
+                    <a class="page-link" th:href="@{/archives(page=*{pagenation.totalPages - 1})}" aria-label="Last">
+                        <span aria-hidden="true">&raquo;</span>
+                    </a>
+                </li>
+            </ul>
+        </nav>
+
+        <!-- Modal Window -->
+        <div id="modal" class="modal fade">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <p id="name" class="modal-name"></p>
+                    </div>
+                    <div class="modal-body">
+                        <p id="year"></p>
+                        <img id="image" />
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-dismiss="modal" th:text="#{modal.close}"></button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js" integrity="sha384-UO2eT0CpHqdSJQ6hJty5KVphtPhzWj9WO1clHTMGa3JDZwrnQq4sF86dIHNDz0W1" crossorigin="anonymous"></script>
+        <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js" integrity="sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07jRM" crossorigin="anonymous"></script>
+    </body>
+</html>

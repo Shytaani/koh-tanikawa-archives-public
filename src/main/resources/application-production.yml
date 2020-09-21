@@ -1,0 +1,21 @@
+spring:
+  datasource:
+    url: jdbc:mysql://xxxx.xxxxxx.ap-northeast-1.rds.amazonaws.com:3306/koh_tanikawa_archives?serverTimezone=JST
+    username: foo
+    password: bar
+  jpa:
+    database: mysql
+    hibernate:
+      ddl-auto: update
+  messages:
+    basename: messages_ja, messages_en
+  flyway:
+    check-location: false
+
+server:
+  servlet:
+    context-path: /
+  forward-headers-strategy: native
+
+app:
+  image-path: https://xxxxxx.s3-ap-northeast-1.amazonaws.com/image/

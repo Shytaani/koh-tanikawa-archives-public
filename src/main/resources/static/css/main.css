@@ -1,0 +1,21 @@
+@charset "UTF-8";
+
+body {
+    background-color: gainsboro;
+}
+
+img {
+    max-width: 100%;
+    height: auto;
+    transition-duration: 0.5s;
+    margin-bottom: 20px;
+}
+
+img.logo {
+    width:auto;
+    height:auto;
+}
+
+#dialog {
+    display: none;
+}
